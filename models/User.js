@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    isLoggedIn: Boolean,
     fullName: {
         type: String,
         required: true

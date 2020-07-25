@@ -6,7 +6,8 @@ const uri = `mongodb+srv://${process.env.ATLAS_USER}:${process.env.ATLAS_PASSWOR
 mongoose.connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndex: true
+    useCreateIndex: true,
+    useFindAndModify: false
 })
 .then(() => console.log("Database connected"))
 .catch(err => console.log(err))
