@@ -3,7 +3,7 @@ const User = require('./../models/User')
 
 const auth = async (req, res, next) => {
     try {
-        console.log(req.cookies, 'req.cookies')
+        console.log(req.cookies, 'req.cookies isAuth')
         if(req.cookies.token) {
             const { userName } = jwt.verify(req.cookies.token, process.env.JWT_PRIVATE_KEY)
             const user = await User.findOne({userName})

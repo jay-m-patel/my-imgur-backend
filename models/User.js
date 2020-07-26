@@ -23,4 +23,12 @@ const userSchema = new mongoose.Schema({
 
 const User = new mongoose.model('users', userSchema)
 
+User.on('index', function(err) {
+    if (err) {
+        console.error('User index error: %s', err);
+    } else {
+        console.info('User indexing complete');
+    }
+});
+
 module.exports = User

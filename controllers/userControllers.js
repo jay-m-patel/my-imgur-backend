@@ -1,12 +1,44 @@
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const User = require('./../models/User')
+const Post = require('./../models/Post')
 
-const cookieOptions = {}
+const cookieOptions = {httpOnly: true, secure: false}   // set secure:false after deploying front-end
 
-const isLoggedIn = 'isLoggedIn'
 const errorName = 'errorName'
 const errorMsg = 'errorMsg'
+
+
+module.exports.dashboard = async (req, res) => {
+
+    try {
+        const checkToken = async req => {
+            if(req.cookies.token) {
+                const { userName } = jwt.verify(req.cookies.token, process.env.JWT_PRIVATE_KEY)
+                const user = await User.findOne({userName})
+                return user
+            } else return null
+        }
+    
+        const user = await checkToken(req)
+
+        const posts = await Post.find().sort({ _id: -1 }).limit(20)
+    
+        res.json({
+            user: user,
+            posts: posts
+        })
+    
+    } catch(err) {
+        console.error(err, err.name, err.message)
+        res.json({
+            [errorName]: err.name,
+            [errorMsg]: err.message,
+            error: err
+        })
+    }
+}
+
 
 module.exports.register = async (req, res) => {
     
@@ -28,8 +60,6 @@ module.exports.register = async (req, res) => {
 
         res.cookie('token', token, cookieOptions)
         res.json({
-            registeredSuccessfully: true,
-            [isLoggedIn]: true,
             user: savedUser
         })
 
@@ -48,7 +78,7 @@ module.exports.login = async (req, res) => {
     
     try {
         const {userName, password} = req.body
-        const user = await User.findOneAndUpdate({userName}, {isLoggedIn: true})
+        const user = await User.findOneAndUpdate({userName}, {isLoggedIn: true}, {new: true})
         
         if(user === null) return res.json({
             [errorName]: "unauthenticated",
@@ -67,7 +97,6 @@ module.exports.login = async (req, res) => {
 
             res.cookie('token', token, cookieOptions)
             res.json({
-                [isLoggedIn]: true,
                 user: user
             })            
         }
